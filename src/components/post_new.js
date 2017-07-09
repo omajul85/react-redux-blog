@@ -1,24 +1,46 @@
 import React, { Component } from 'react';
 import { Field, reduxForm }from 'redux-form';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { createPost } from '../actions';
 
 class PostsNew extends Component {
   renderField(field) {
+    const { meta: { touched, error } } = field;
+    const className = `form-group ${touched && error && "has-danger"}`;
     return (
-      <div className="form-group">
+      <div className={className}>
         <label>{field.label}</label>
         <input className="form-control" type="text" {...field.input} />
-        {field.meta.error}
+        <div className="text-help">
+          {touched && error}
+        </div>
       </div>
     )
   }
 
+  onSubmit(values) {
+    // Call the action-creator to make the API request
+    this.props.createPost(values, () => {
+      this.props.history.push('/');
+    });
+  }
+
   render() {
+    // handleSubmit comes from redux-form
+    const { handleSubmit } = this.props;
+
     return (
-      <form>
-        <Field name="title" label="Title" component={this.renderField} />
-        <Field name="categories" label="Categories" component={this.renderField} />
-        <Field name="content" label="Content" component={this.renderField} />
-      </form>
+      <div>
+        <h3>New Post</h3>
+        <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+          <Field name="title" label="Title" component={this.renderField} />
+          <Field name="categories" label="Categories" component={this.renderField} />
+          <Field name="content" label="Content" component={this.renderField} />
+          <button type="submit" className="btn btn-warning">Submit</button>
+          <Link to="/" className="btn btn-danger">Cancel</Link>
+        </form>
+      </div>
     );
   }
 }
@@ -47,4 +69,6 @@ function validate(values) {
 export default reduxForm({
   validate,
   form: 'PostsNewForm' //this is kind of a namespace (unique) for the form
-})(PostsNew);
+})(
+  connect(null, { createPost })(PostsNew)
+);

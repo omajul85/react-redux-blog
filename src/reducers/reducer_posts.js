@@ -1,5 +1,5 @@
 import { mapKeys } from 'lodash';
-import { FETCH_POSTS } from '../actions';
+import { FETCH_POSTS, CREATE_POST } from '../actions';
 
 export default function (state = {}, action) {
   switch (action.type) {
